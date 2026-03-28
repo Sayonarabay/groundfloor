@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { box-sizing: border-box; }
+
+  :root {
+    --font-cormorant: 'Cormorant Garamond', Georgia, serif;
+    --font-dm-sans: 'DM Sans', system-ui, sans-serif;
+  }
+
+  html { height: 100%; }
+  body { height: 100%; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #ddd8ce; border-radius: 2px; }
+  ::-webkit-scrollbar-thumb:hover { background: #9a9088; }
+}
+
+@layer components {
+  .font-serif { font-family: var(--font-cormorant); }
+
+  /* Status pills */
+  .status-idea         { @apply bg-stone-100 text-stone-600; }
+  .status-en-desarrollo { @apply bg-blue-50 text-blue-700; }
+  .status-grabado      { @apply bg-amber-50 text-amber-700; }
+  .status-editado      { @apply bg-violet-50 text-violet-700; }
+  .status-publicado    { @apply bg-emerald-50 text-emerald-700; }
+
+  /* Kanban column accent lines */
+  .col-idea         { @apply border-t-stone-300; }
+  .col-en-desarrollo { @apply border-t-blue-400; }
+  .col-grabado      { @apply border-t-amber-400; }
+  .col-editado      { @apply border-t-violet-400; }
+  .col-publicado    { @apply border-t-emerald-500; }
+}

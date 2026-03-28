@@ -1,0 +1,56 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Walk {
+  id            String    @id @default(cuid())
+  title         String
+  city          String    @default("Paris")
+  district      String
+  protagonist   String?
+  status        String    @default("idea")
+  recordingDate DateTime?
+  publishDate   DateTime?
+  cost          Float?
+  duration      Int?      // minutes
+  notes         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  script        Script?
+}
+
+model Script {
+  id          String  @id @default(cuid())
+  walkId      String  @unique
+  walk        Walk    @relation(fields: [walkId], references: [id], onDelete: Cascade)
+
+  // Each phase: text content + optional speaker + notes
+  arrivalText      String?
+  arrivalSpeaker   String?
+  arrivalNotes     String?
+
+  observationText      String?
+  observationSpeaker   String?
+  observationNotes     String?
+
+  discoveryText      String?
+  discoverySpeaker   String?
+  discoveryNotes     String?
+
+  expansionText      String?
+  expansionSpeaker   String?
+  expansionNotes     String?
+
+  reframingText      String?
+  reframingSpeaker   String?
+  reframingNotes     String?
+
+  updatedAt DateTime @updatedAt
+}

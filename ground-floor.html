@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ground Floor — Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#18150f;--ink2:#4a4238;--ink3:#9a9088;
+  --cream:#f4f1ea;--cream2:#ede9e0;
+  --terra:#c4622d;--terra2:#e8855a;--terra-light:#f2e6de;
+  --done:#2a6e46;--done-light:#daf0e5;
+  --border:#ddd8ce;--surface:#faf8f4;--white:#fff;
+  --sidebar:52px;
+}
+html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;background:var(--cream2);color:var(--ink);font-size:14px}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+/* ── LAYOUT ── */
+.shell{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--ink);display:flex;flex-direction:column;align-items:center;padding:14px 0;z-index:50}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+/* ── SIDEBAR ── */
+.logo-mark{width:28px;height:28px;background:var(--terra);border-radius:5px;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;color:#fff;font-size:15px;font-weight:500;margin-bottom:20px;cursor:pointer;flex-shrink:0}
+.nav-btn{width:34px;height:34px;border-radius:7px;display:flex;align-items:center;justify-content:center;border:none;background:none;cursor:pointer;color:rgba(255,255,255,.4);transition:all .15s;margin-bottom:4px;font-size:15px}
+.nav-btn:hover{background:rgba(255,255,255,.1);color:rgba(255,255,255,.8)}
+.nav-btn.active{background:var(--terra);color:#fff}
+.sb-footer{margin-top:auto;font-size:9px;color:rgba(255,255,255,.2);text-align:center;line-height:1.6}
+
+/* ── TOPBAR ── */
+.topbar{height:52px;min-height:52px;background:var(--surface);border-bottom:0.5px solid var(--border);display:flex;align-items:center;padding:0 22px;gap:14px}
+.topbar-title{font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:400}
+.topbar-sub{font-size:11px;color:var(--ink3)}
+.topbar-actions{margin-left:auto;display:flex;gap:8px}
+.btn{padding:7px 16px;border-radius:7px;font-size:12.5px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;border:none;transition:all .12s}
+.btn-primary{background:var(--terra);color:#fff}
+.btn-primary:hover{background:var(--terra2)}
+.btn-outline{background:none;border:0.5px solid var(--border);color:var(--ink2)}
+.btn-outline:hover{background:var(--cream)}
+.btn-ghost{background:none;color:var(--ink3);font-size:12px;padding:5px 10px}
+.btn-ghost:hover{color:var(--ink)}
+
+/* ── CONTENT ── */
+.content{flex:1;overflow-y:auto;padding:26px 26px}
+
+/* ── KANBAN ── */
+.board{display:flex;gap:14px;min-height:calc(100vh - 160px)}
+.col{flex-shrink:0;width:270px;border-radius:12px;background:var(--cream2);border:0.5px solid var(--border);padding:12px;display:flex;flex-direction:column}
+.col.drag-over{background:var(--terra-light);border-color:rgba(196,98,45,.35)}
+.col-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:10px;border-bottom:0.5px solid var(--border)}
+.col-name{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--ink2)}
+.col-cnt{font-size:11px;color:var(--ink3);background:var(--border);padding:1px 7px;border-radius:20px}
+.col-accent{height:2px;border-radius:2px 2px 0 0;margin:-12px -12px 12px}
+.accent-idea{background:#a0a0a0}
+.accent-dev{background:#4a7fc1}
+.accent-grab{background:#d4a017}
+.accent-edit{background:#7c5cbf}
+.accent-pub{background:#2a9d5c}
+.card{background:var(--white);border:0.5px solid var(--border);border-radius:8px;padding:12px 13px;margin-bottom:8px;cursor:grab;transition:all .12s;user-select:none}
+.card:hover{border-color:rgba(196,98,45,.4);box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.card.dragging{opacity:.4;transform:scale(.96)}
+.card-grip{color:rgba(0,0,0,.15);font-size:10px;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between}
+.card-title{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:400;line-height:1.25;margin-bottom:8px;cursor:pointer;transition:color .12s}
+.card-title:hover{color:var(--terra)}
+.card-meta{display:flex;flex-direction:column;gap:4px}
+.meta-row{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ink3)}
+.meta-icon{width:11px;text-align:center;flex-shrink:0;font-size:11px}
+.col-empty{border:1.5px dashed var(--border);border-radius:7px;padding:16px;text-align:center;font-size:12px;color:var(--ink3);margin-top:4px;font-style:italic}
+
+/* ── STATUS BADGES ── */
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:10.5px;font-weight:500;letter-spacing:.03em}
+.badge-idea{background:#f0f0f0;color:#666}
+.badge-dev{background:#dde8f5;color:#2a5a9a}
+.badge-grab{background:#fef3d7;color:#8a6010}
+.badge-edit{background:#ede8f8;color:#5a3a9a}
+.badge-pub{background:var(--done-light);color:var(--done)}
+
+/* ── WALK DETAIL ── */
+.detail-shell{display:flex;flex:1;overflow:hidden}
+.meta-panel{width:240px;min-width:240px;border-right:0.5px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;background:var(--surface)}
+.meta-header{padding:18px 18px 14px;border-bottom:0.5px solid var(--border)}
+.meta-title-input{width:100%;font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:400;line-height:1.3;border:none;background:transparent;color:var(--ink);resize:none;outline:none;font-style:normal}
+.meta-body{padding:16px 18px;display:flex;flex-direction:column;gap:16px;flex:1}
+.meta-field label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);margin-bottom:5px}
+.meta-field input,.meta-field select,.meta-field textarea{width:100%;border:none;border-bottom:0.5px solid var(--border);background:transparent;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--ink);padding:3px 0 5px;outline:none;transition:border-color .12s}
+.meta-field input:focus,.meta-field select:focus,.meta-field textarea:focus{border-bottom-color:var(--terra)}
+.meta-field select{cursor:pointer}
+.meta-field textarea{resize:none;line-height:1.5}
+.meta-divider{height:0.5px;background:var(--border)}
+.meta-footer{padding:14px 18px;border-top:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.save-status{font-size:10px;color:var(--ink3);transition:opacity .3s}
+.delete-btn{font-size:11px;color:var(--ink3);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:color .12s}
+.delete-btn:hover{color:#d04040}
+
+/* ── SCRIPT EDITOR ── */
+.script-shell{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.phase-tabs{display:flex;align-items:flex-end;border-bottom:0.5px solid var(--border);padding:0 22px;background:var(--white);overflow-x:auto;flex-shrink:0}
+.phase-tab{display:flex;flex-direction:column;align-items:flex-start;padding:10px 16px 10px;border-bottom:2px solid transparent;cursor:pointer;transition:all .12s;white-space:nowrap;border:none;background:none;font-family:'DM Sans',sans-serif;color:var(--ink3);margin-bottom:-0.5px}
+.phase-tab:hover{color:var(--ink);background:var(--cream2)}
+.phase-tab.active{border-bottom-color:var(--terra);color:var(--ink);background:rgba(196,98,45,.04)}
+.phase-tab-num{font-size:10px;color:var(--terra);opacity:.6;font-weight:500;margin-bottom:1px}
+.phase-tab-label{font-size:13px;font-weight:500}
+.phase-tab-words{font-size:10px;color:var(--ink3);margin-top:2px}
+.phase-dot{width:5px;height:5px;border-radius:50%;background:var(--terra);opacity:.5;margin-left:6px;display:inline-block}
+.editor-top{display:flex;align-items:center;justify-content:space-between;padding:10px 22px;background:var(--cream2);border-bottom:0.5px solid var(--border);flex-shrink:0}
+.phase-hint{font-size:11.5px;color:var(--ink3);font-style:italic;line-height:1.4}
+.autosave-indicator{font-size:10.5px;font-weight:500;transition:all .3s}
+.autosave-saving{color:var(--ink3)}
+.autosave-saved{color:var(--done)}
+.editor-body{display:flex;flex:1;overflow:hidden}
+.text-area-wrap{flex:1;overflow-y:auto;padding:22px 26px}
+.script-textarea{width:100%;min-height:360px;border:none;background:transparent;font-family:'Cormorant Garamond',serif;font-size:18px;line-height:1.85;color:var(--ink);resize:none;outline:none}
+.script-textarea::placeholder{color:rgba(154,144,136,.5);font-style:italic;font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.7}
+.editor-gutter{width:200px;min-width:200px;border-left:0.5px solid var(--border);padding:18px 16px;display:flex;flex-direction:column;gap:16px;overflow-y:auto;background:rgba(244,241,234,.3)}
+.gutter-field label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);margin-bottom:5px}
+.gutter-field input,.gutter-field textarea{width:100%;background:var(--white);border:0.5px solid var(--border);border-radius:6px;padding:7px 10px;font-size:12px;font-family:'DM Sans',sans-serif;color:var(--ink);outline:none;transition:border-color .12s}
+.gutter-field input:focus,.gutter-field textarea:focus{border-color:var(--terra)}
+.gutter-field textarea{resize:none;line-height:1.5}
+.word-card{background:var(--white);border:0.5px solid var(--border);border-radius:8px;padding:14px;text-align:center}
+.word-big{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;color:var(--ink)}
+.word-label{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink3);margin-top:2px}
+.word-min{font-size:11px;color:var(--ink3);margin-top:6px}
+.editor-footer{padding:10px 22px;border-top:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--white);flex-shrink:0}
+.total-words{font-size:11px;color:var(--ink3)}
+
+/* ── CALENDAR ── */
+.cal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.cal-nav{display:flex;align-items:center;gap:8px}
+.cal-nav-btn{width:30px;height:30px;border-radius:6px;border:0.5px solid var(--border);background:none;cursor:pointer;font-size:14px;color:var(--ink2);display:flex;align-items:center;justify-content:center;transition:background .12s}
+.cal-nav-btn:hover{background:var(--cream)}
+.cal-today-btn{padding:4px 12px;border-radius:6px;border:0.5px solid var(--border);background:none;cursor:pointer;font-size:11px;font-family:'DM Sans',sans-serif;color:var(--ink2);transition:background .12s}
+.cal-today-btn:hover{background:var(--cream)}
+.cal-grid{background:var(--white);border-radius:12px;border:0.5px solid var(--border);overflow:hidden}
+.cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);border-bottom:0.5px solid var(--border)}
+.cal-wd{padding:10px 0;text-align:center;font-size:10.5px;font-weight:500;text-transform:uppercase;letter-spacing:.07em;color:var(--ink3)}
+.cal-days{display:grid;grid-template-columns:repeat(7,1fr)}
+.cal-day{min-height:90px;padding:8px;border-bottom:0.5px solid var(--border);border-right:0.5px solid var(--border);transition:background .12s}
+.cal-day:nth-child(7n){border-right:none}
+.cal-day.other-month{background:var(--cream2)}
+.cal-day.today{background:rgba(196,98,45,.06)}
+.cal-day-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--ink3);margin-bottom:4px;margin-left:auto}
+.cal-day.in-month .cal-day-num{color:var(--ink)}
+.cal-day.today .cal-day-num{background:var(--terra);color:#fff;font-weight:500}
+.cal-event{font-size:10px;padding:2px 6px;border-radius:4px;margin-bottom:2px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:opacity .12s}
+.cal-event:hover{opacity:.8}
+.cal-ev-rec{background:rgba(196,98,45,.12);color:var(--terra)}
+.cal-ev-pub{background:var(--done-light);color:var(--done)}
+.cal-legend{display:flex;gap:16px;margin-top:14px}
+.cal-leg-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ink3)}
+.cal-leg-dot{width:10px;height:10px;border-radius:3px}
+
+/* ── MODAL ── */
+.overlay{position:fixed;inset:0;background:rgba(24,21,15,.6);z-index:100;display:none;align-items:center;justify-content:center}
+.overlay.open{display:flex}
+.modal{background:var(--white);border-radius:14px;padding:26px;width:460px;max-width:94vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.modal h2{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:400;margin-bottom:20px}
+.modal-close{position:absolute;right:26px;top:24px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--ink3);line-height:1}
+.modal-close:hover{color:var(--ink)}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);margin-bottom:6px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:9px 12px;border:0.5px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);background:var(--cream2);outline:none;transition:border-color .12s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--terra);background:var(--white)}
+.form-group textarea{resize:vertical;min-height:70px;line-height:1.5}
+.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+.btn-cancel{background:none;border:0.5px solid var(--border);color:var(--ink2);padding:8px 16px;border-radius:7px;cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif}
+.btn-cancel:hover{background:var(--cream)}
+.btn-save{background:var(--terra);color:#fff;border:none;padding:8px 20px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:500;font-family:'DM Sans',sans-serif}
+.btn-save:hover{background:var(--terra2)}
+.btn-save:disabled{opacity:.5;cursor:not-allowed}
+
+/* ── STATS ROW ── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:22px}
+.stat-card{background:var(--white);border:0.5px solid var(--border);border-radius:10px;padding:14px 16px}
+.stat-val{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:400;line-height:1}
+.stat-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink3);margin-top:4px}
+.stat-card.accent .stat-val{color:var(--terra)}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="logo-mark" onclick="navigate('board')" title="Ground Floor">G</div>
+  <button class="nav-btn active" id="nav-board" onclick="navigate('board')" title="Kanban">⊞</button>
+  <button class="nav-btn" id="nav-calendar" onclick="navigate('calendar')" title="Calendar">◷</button>
+  <div class="sb-footer">GF<br>26</div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title" id="page-title">Ground Floor</div>
+      <div class="topbar-sub" id="page-sub">Loading…</div>
+    </div>
+    <div class="topbar-actions" id="topbar-actions"></div>
+  </div>
+  <div class="content" id="content"></div>
+</div>
+</div>
+
+<!-- NEW WALK MODAL -->
+<div class="overlay" id="new-walk-modal" onclick="if(event.target===this)closeModal('new-walk-modal')">
+  <div class="modal" style="position:relative">
+    <button class="modal-close" onclick="closeModal('new-walk-modal')">×</button>
+    <h2>New walk</h2>
+    <div class="form-group"><label>Title *</label><input id="nw-title" placeholder="Le jardin fermé" autocomplete="off"></div>
+    <div class="form-group"><label>District</label><input id="nw-district" placeholder="BNF — 13ème" autocomplete="off"></div>
+    <div class="form-group"><label>Protagonist</label><input id="nw-protagonist" placeholder="JR, Abd Al Malik…" autocomplete="off"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('new-walk-modal')">Cancel</button>
+      <button class="btn-save" id="nw-save" onclick="createWalk()">Create walk</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════ DATA ═══════════════════
+const STATUSES = [
+  {id:'idea',       label:'Idea',         accentClass:'accent-idea', badgeClass:'badge-idea'},
+  {id:'en-desarrollo', label:'En desarrollo', accentClass:'accent-dev',  badgeClass:'badge-dev'},
+  {id:'grabado',    label:'Grabado',       accentClass:'accent-grab', badgeClass:'badge-grab'},
+  {id:'editado',    label:'Editado',       accentClass:'accent-edit', badgeClass:'badge-edit'},
+  {id:'publicado',  label:'Publicado',     accentClass:'accent-pub',  badgeClass:'badge-pub'},
+]
+
+const PHASES = [
+  {key:'arrival',     label:'Arrival',     num:'01', hint:'Situate the listener. Where they are, what they see — before you tell them anything.'},
+  {key:'observation', label:'Observation', num:'02', hint:'Teach them how to look. One concrete detail that changes what is in front of them.'},
+  {key:'discovery',   label:'Discovery',   num:'03', hint:'Reveal something hidden. The layer beneath the surface.'},
+  {key:'expansion',   label:'Expansion',   num:'04', hint:'Connect to wider context. History, power, culture — what this place means in the world.'},
+  {key:'reframing',   label:'Reframing',   num:'05', hint:'Shift perception. They leave seeing the place differently than they arrived.'},
+]
+
+const SEED_WALKS = [
+  {id:'w1',title:"Le jardin fermé",city:'Paris',district:'13ème — BNF',protagonist:'Autor editorial',status:'en-desarrollo',recordingDate:'2026-04-18',publishDate:'2026-04-28',cost:550,duration:22,notes:'Walk de autor. Todo acceso gratuito. Esplanade → interior → pasarela Simone de Beauvoir → Los Frigos.',
+   script:{
+     arrivalText:`Avant de regarder les tours, regarde les gens.\n\nC'est toujours la première chose que je fais. Pas le bâtiment — les gens autour du bâtiment. Comment ils se déplacent, où ils regardent, ce qu'ils ignorent. Et ici, quelque chose m'inquiète à chaque fois que je viens : personne ne lève les yeux.\n\nTrente-neuf étages de verre, quatre tours qui devraient être impossibles à ignorer, et les gens traversent cette esplanade la tête baissée, pressés, comme s'ils avaient passé un accord tacite avec le monument. Toi, tu restes là. Moi, je passe devant. Aucun de nous ne doit rien à l'autre.\n\nÇa m'intéresse plus que n'importe quelle donnée sur l'architecte.`,
+     arrivalSpeaker:'Narrator',arrivalNotes:'Instruction: Climb the steps from Quai François-Mauriac. Walk to the inner edge of the esplanade.',
+     observationText:`Le jardin que tu vois maintenant, tu ne peux pas y marcher.\n\nPersonne ne peut. Il existe pour être regardé d'ici, depuis les vitres des salles de lecture, depuis les bureaux des tours. Perrault l'a conçu comme le jardin d'un cloître : au centre de tout, inaccessible à tous.\n\nCent vingt-six pins venus des forêts de Normandie. Les spécialistes le savaient depuis le début : déraciner un pin adulte de son sol, le priver du vent, de la pluie directe, du contact réel avec le monde, c'est lui demander de feindre d'être vivant dans des conditions qu'il ne reconnaît pas.\n\nEt pourtant le jardin existe. Il vit sans nous mieux qu'avec nous. Un faucon pèlerin a niché au sommet d'une des tours.`,
+     observationSpeaker:'Narrator',observationNotes:'Instruction: Walk to where the towers open up. The garden is below.',
+     discoveryText:`Arrête-toi un moment.\n\nRegarde qui est là.\n\nLes étudiants qui sont venus travailler parce qu'ils ne peuvent pas se concentrer chez eux. Les retraités qui lisent le journal parce qu'il fait chaud et calme ici. Les sans-abri qui dorment dans les fauteuils des foyers jusqu'à ce que quelqu'un les réveille.\n\nC'est l'usage réel d'un monument présidentiel. Pas celui que Mitterrand imaginait quand il a demandé à Perrault un bâtiment éternel — celui que la ville lui a imposé après, comme elle le fait toujours.`,
+     discoverySpeaker:'Narrator',discoveryNotes:'Instruction: Enter via Hall Est. No credential needed for the free access area.',
+     expansionText:`Cette passerelle s'appelle Simone de Beauvoir.\n\nInaugurée en 2006. C'est le seul pont piétonnier de Paris construit au XXIe siècle, et il a une forme qu'aucun autre pont de la ville n'a : deux arcs qui se croisent au centre, créant un espace intermédiaire qui n'est ni une rive ni l'autre. Un lieu qui n'existe que dans le croisement.\n\nRegarde vers le sud d'ici. Ce bâtiment en béton avec les murs taggés qui ressemble à un bunker industriel, c'est Les Frigos. Construit dans les années 20 comme entrepôt frigorifique. Abandonné dans les années 60. Occupé dans les années 80 par des artistes qui ont attaqué les murs de 60 centimètres au marteau-piqueur pour ouvrir des fenêtres.`,
+     expansionSpeaker:'Narrator',expansionNotes:'Instruction: Exit Hall Est. The footbridge is 2 minutes east.',
+     reframingText:`Tu es devant un bâtiment que personne n'a conçu pour être beau.\n\nLes murs en béton font soixante-dix centimètres d'épaisseur. Les fenêtres ont été ouvertes au marteau-piqueur. Les tags couvrent toute surface extérieure disponible.\n\nEt pourtant il y a quelque chose ici que la BNF, avec tout son budget et toute sa volonté d'éternité, n'a pas : la sensation que quelque chose se passe là-dedans maintenant.\n\nLa différence, c'est que l'une a été décidée par un président, et l'autre par les gens qui n'avaient nulle part où aller.`,
+     reframingSpeaker:'Narrator',reframingNotes:'Instruction: Down from the bridge. Rue des Frigos 19.',
+   }},
+  {id:'w2',title:"Les murs de JR",city:'Paris',district:'Belleville — 20ème',protagonist:'JR',status:'idea',recordingDate:'2026-06-01',cost:0,duration:25,notes:'Protagonista: JR. Proponer co-autoría, no fee fijo. Acceder via Fondation Cartier o 59 Rivoli.',script:{}},
+  {id:'w3',title:"Ici c'était nous",city:'Paris',district:'Châtelet — Les Halles',protagonist:'Abd Al Malik',status:'idea',cost:0,duration:20,notes:'La escena del rap francés nació en las escaleras del RER de Châtelet en los 90.',script:{}},
+  {id:'w4',title:'La table',city:'Paris',district:'Aligre — 11ème',protagonist:'Iñaki Aizpitarte',status:'idea',cost:0,duration:22,notes:'Marché d\'Aligre à 8h. El más accesible de los protagonistas.',script:{}},
+  {id:'w5',title:'Le son',city:'Paris',district:'Rex Club — 10ème',protagonist:'Laurent Garnier',status:'idea',cost:0,duration:24,notes:'Tiene libro Electrochoc. Accesible via Rex Club directamente.',script:{}},
+]
+
+// ═══════════════════ STATE ═══════════════════
+function loadWalks(){
+  try{const d=localStorage.getItem('gf_walks');if(d)return JSON.parse(d)}catch{}
+  const seed=JSON.parse(JSON.stringify(SEED_WALKS))
+  save('gf_walks',seed);return seed
+}
+function save(key,data){try{localStorage.setItem(key,JSON.stringify(data))}catch{}}
+
+let walks=loadWalks()
+let currentView='board'
+let currentWalkId=null
+let currentPhase='arrival'
+let autoSaveTimer=null
+let autoSaveStatus='idle'
+
+function saveWalks(){save('gf_walks',walks)}
+
+function getWalk(id){return walks.find(w=>w.id===id)}
+function getStatus(id){return STATUSES.find(s=>s.id===id)||STATUSES[0]}
+
+// ═══════════════════ NAVIGATION ═══════════════════
+function navigate(view,walkId=null){
+  currentView=view
+  currentWalkId=walkId
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'))
+  if(view==='board'||view==='walk')document.getElementById('nav-board').classList.add('active')
+  if(view==='calendar')document.getElementById('nav-calendar').classList.add('active')
+  render()
+}
+
+function render(){
+  if(currentView==='board')renderBoard()
+  else if(currentView==='walk')renderWalk()
+  else if(currentView==='calendar')renderCalendar()
+}
+
+// ═══════════════════ BOARD ═══════════════════
+function renderBoard(){
+  document.getElementById('page-title').textContent='Ground Floor'
+  document.getElementById('page-sub').textContent=`${walks.length} walk${walks.length!==1?'s':''} · Paris`
+  document.getElementById('topbar-actions').innerHTML=`<button class="btn btn-primary" onclick="openNewWalk()">+ New walk</button>`
+
+  const done=walks.filter(w=>w.status==='publicado').length
+  const pct=walks.length?Math.round(done/walks.length*100):0
+
+  let html=`<div class="stats-row">
+    <div class="stat-card"><div class="stat-val">${walks.length}</div><div class="stat-lbl">Total walks</div></div>
+    <div class="stat-card"><div class="stat-val">${walks.filter(w=>w.status==='en-desarrollo').length}</div><div class="stat-lbl">In production</div></div>
+    <div class="stat-card"><div class="stat-val">${done}</div><div class="stat-lbl">Published</div></div>
+    <div class="stat-card accent"><div class="stat-val">${pct}%</div><div class="stat-lbl">Complete</div></div>
+  </div>
+  <div class="board">`
+
+  for(const s of STATUSES){
+    const colWalks=walks.filter(w=>w.status===s.id)
+    html+=`<div class="col" data-status="${s.id}" ondragover="onDragOver(event,this)" ondrop="onDrop(event,'${s.id}')" ondragleave="this.classList.remove('drag-over')">
+      <div class="col-accent ${s.accentClass}"></div>
+      <div class="col-hdr">
+        <span class="col-name">${s.label}</span>
+        <span class="col-cnt">${colWalks.length}</span>
+      </div>`
+    for(const w of colWalks){
+      const recDate=w.recordingDate?new Date(w.recordingDate).toLocaleDateString('fr-FR',{day:'numeric',month:'short'}):''
+      html+=`<div class="card" draggable="true" id="card-${w.id}" ondragstart="onDragStart(event,'${w.id}')" ondragend="onDragEnd(event)">
+        <div class="card-grip"><span style="letter-spacing:1px">⠿⠿</span><span class="${s.badgeClass} badge">${s.label}</span></div>
+        <div class="card-title" onclick="navigate('walk','${w.id}')">${e(w.title)}</div>
+        <div class="card-meta">
+          ${w.district?`<div class="meta-row"><span class="meta-icon">◎</span>${e(w.district)}</div>`:''}
+          ${w.protagonist?`<div class="meta-row"><span class="meta-icon">◉</span>${e(w.protagonist)}</div>`:''}
+          ${recDate?`<div class="meta-row"><span class="meta-icon">◷</span>Rec. ${recDate}</div>`:''}
+          ${w.cost?`<div class="meta-row"><span class="meta-icon">€</span>${w.cost.toLocaleString()}</div>`:''}
+        </div>
+      </div>`
+    }
+    if(colWalks.length===0)html+=`<div class="col-empty">Drop here</div>`
+    html+=`</div>`
+  }
+  html+=`</div>`
+  document.getElementById('content').innerHTML=html
+}
+
+// ─── DRAG & DROP ───
+let dragId=null
+function onDragStart(e,id){
+  dragId=id
+  e.dataTransfer.effectAllowed='move'
+  setTimeout(()=>document.getElementById('card-'+id)?.classList.add('dragging'),0)
+}
+function onDragEnd(e){
+  document.querySelectorAll('.card').forEach(c=>c.classList.remove('dragging'))
+  document.querySelectorAll('.col').forEach(c=>c.classList.remove('drag-over'))
+}
+function onDragOver(e,col){e.preventDefault();col.classList.add('drag-over')}
+function onDrop(e,status){
+  e.preventDefault()
+  document.querySelectorAll('.col').forEach(c=>c.classList.remove('drag-over'))
+  if(!dragId)return
+  const w=getWalk(dragId)
+  if(w&&w.status!==status){w.status=status;saveWalks();renderBoard()}
+  dragId=null
+}
+
+// ═══════════════════ WALK DETAIL ═══════════════════
+function renderWalk(){
+  const walk=getWalk(currentWalkId)
+  if(!walk){navigate('board');return}
+  const s=getStatus(walk.status)
+  document.getElementById('page-title').textContent=walk.title
+  document.getElementById('page-sub').textContent=walk.district||walk.city||'Paris'
+  document.getElementById('topbar-actions').innerHTML=`
+    <button class="btn btn-ghost" onclick="navigate('board')">← Walks</button>
+    <span class="badge ${s.badgeClass}" style="padding:5px 12px">${s.label}</span>`
+
+  const script=walk.script||{}
+  const activePhase=PHASES.find(p=>p.key===currentPhase)||PHASES[0]
+  const textKey=activePhase.key+'Text'
+  const speakerKey=activePhase.key+'Speaker'
+  const notesKey=activePhase.key+'Notes'
+  const wc=countWords(script[textKey])
+
+  let tabsHtml=''
+  for(const p of PHASES){
+    const w=countWords(script[p.key+'Text'])
+    const isActive=p.key===currentPhase
+    const has=w>0
+    tabsHtml+=`<button class="phase-tab ${isActive?'active':''}" onclick="switchPhase('${p.key}')">
+      <div class="phase-tab-num">${p.num}</div>
+      <div class="phase-tab-label">${p.label}${has&&!isActive?'<span class="phase-dot"></span>':''}</div>
+      ${isActive&&w>0?`<div class="phase-tab-words">${w}w · ~${Math.round(w/150)}min</div>`:''}
+    </button>`
+  }
+
+  const totalW=PHASES.reduce((a,p)=>a+countWords(script[p.key+'Text']),0)
+
+  document.getElementById('content').innerHTML=`
+  <div class="detail-shell" style="height:calc(100vh - 100px)">
+
+    <!-- META PANEL -->
+    <div class="meta-panel">
+      <div class="meta-header">
+        <textarea class="meta-title-input" rows="2" oninput="updateWalkField('title',this.value)" onblur="saveWalks()">${e(walk.title)}</textarea>
+        <div style="margin-top:10px">
+          <select style="font-size:12px;color:var(--ink2);border:none;background:transparent;outline:none;cursor:pointer;font-family:'DM Sans',sans-serif;width:100%" onchange="updateWalkField('status',this.value);saveWalks();renderWalk()">
+            ${STATUSES.map(s=>`<option value="${s.id}" ${walk.status===s.id?'selected':''}>${s.label}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="meta-body">
+        <div class="meta-field"><label>City</label><input value="${e(walk.city||'')}" oninput="updateWalkField('city',this.value)" onblur="saveWalks()" placeholder="Paris"></div>
+        <div class="meta-field"><label>District</label><input value="${e(walk.district||'')}" oninput="updateWalkField('district',this.value)" onblur="saveWalks()" placeholder="BNF — 13ème"></div>
+        <div class="meta-field"><label>Protagonist</label><input value="${e(walk.protagonist||'')}" oninput="updateWalkField('protagonist',this.value)" onblur="saveWalks()" placeholder="JR, Abd Al Malik…"></div>
+        <div class="meta-divider"></div>
+        <div class="meta-field"><label>Recording date</label><input type="date" value="${walk.recordingDate||''}" oninput="updateWalkField('recordingDate',this.value)" onblur="saveWalks()"></div>
+        <div class="meta-field"><label>Publish date</label><input type="date" value="${walk.publishDate||''}" oninput="updateWalkField('publishDate',this.value)" onblur="saveWalks()"></div>
+        <div class="meta-divider"></div>
+        <div class="meta-field"><label>Cost (€)</label><input type="number" value="${walk.cost||''}" oninput="updateWalkField('cost',parseFloat(this.value)||null)" onblur="saveWalks()" placeholder="0"></div>
+        <div class="meta-field"><label>Duration (min)</label><input type="number" value="${walk.duration||''}" oninput="updateWalkField('duration',parseInt(this.value)||null)" onblur="saveWalks()" placeholder="22"></div>
+        <div class="meta-divider"></div>
+        <div class="meta-field"><label>Notes</label><textarea rows="5" oninput="updateWalkField('notes',this.value)" onblur="saveWalks()" placeholder="Context, contacts, access info…">${e(walk.notes||'')}</textarea></div>
+      </div>
+      <div class="meta-footer">
+        <span class="save-status" id="save-status" style="opacity:0">Saved</span>
+        <button class="delete-btn" onclick="deleteWalk('${walk.id}')">Delete walk</button>
+      </div>
+    </div>
+
+    <!-- SCRIPT EDITOR -->
+    <div class="script-shell">
+      <div class="phase-tabs">${tabsHtml}</div>
+      <div class="editor-top">
+        <div class="phase-hint">${activePhase.hint}</div>
+        <span class="autosave-indicator" id="autosave-ind" style="opacity:0">Saved</span>
+      </div>
+      <div class="editor-body">
+        <div class="text-area-wrap">
+          <textarea class="script-textarea" id="script-text" placeholder="Write the ${activePhase.label.toLowerCase()} here…\n\nThis is where the walk begins. Put the listener in the space before you tell them anything." oninput="onScriptInput(this)">${e(script[textKey]||'')}</textarea>
+        </div>
+        <div class="editor-gutter">
+          <div class="gutter-field"><label>Speaker</label><input id="speaker-input" value="${e(script[speakerKey]||'')}" placeholder="Narrator, JR…" oninput="onGutterInput('${speakerKey}',this.value)"></div>
+          <div class="gutter-field"><label>Production notes</label><textarea id="notes-input" rows="5" placeholder="Movement instruction, sound design note…" oninput="onGutterInput('${notesKey}',this.value)">${e(script[notesKey]||'')}</textarea></div>
+          ${wc>0?`<div class="word-card">
+            <div class="word-big">${wc}</div>
+            <div class="word-label">words</div>
+            <div class="word-min">~${Math.round(wc/150)} min audio</div>
+          </div>`:''}
+        </div>
+      </div>
+      <div class="editor-footer">
+        <div class="total-words">${totalW>0?`Total: ${totalW} words · ~${Math.round(totalW/150)} min`:''}</div>
+        <button class="btn btn-outline" style="font-size:11.5px;padding:5px 14px" onclick="saveWalks();showSaved()">Save</button>
+      </div>
+    </div>
+  </div>`
+}
+
+function switchPhase(key){
+  // Save current text before switching
+  const ta=document.getElementById('script-text')
+  if(ta){
+    const walk=getWalk(currentWalkId)
+    if(walk){
+      if(!walk.script)walk.script={}
+      walk.script[currentPhase+'Text']=ta.value
+      saveWalks()
+    }
+  }
+  currentPhase=key
+  renderWalk()
+}
+
+function updateWalkField(field,value){
+  const w=getWalk(currentWalkId)
+  if(w)w[field]=value
+}
+
+function onScriptInput(ta){
+  const walk=getWalk(currentWalkId)
+  if(!walk)return
+  if(!walk.script)walk.script={}
+  walk.script[currentPhase+'Text']=ta.value
+  scheduleAutoSave()
+  // Update word count live
+  const wc=countWords(ta.value)
+  const card=document.querySelector('.word-card')
+  if(card){
+    card.innerHTML=`<div class="word-big">${wc}</div><div class="word-label">words</div><div class="word-min">~${Math.round(wc/150)} min audio</div>`
+  }
+}
+
+function onGutterInput(field,value){
+  const walk=getWalk(currentWalkId)
+  if(!walk)return
+  if(!walk.script)walk.script={}
+  walk.script[field]=value
+  scheduleAutoSave()
+}
+
+function scheduleAutoSave(){
+  clearTimeout(autoSaveTimer)
+  const ind=document.getElementById('autosave-ind')
+  if(ind){ind.textContent='Saving…';ind.className='autosave-indicator autosave-saving';ind.style.opacity='1'}
+  autoSaveTimer=setTimeout(()=>{
+    saveWalks()
+    if(ind){ind.textContent='✓ Saved';ind.className='autosave-indicator autosave-saved';ind.style.opacity='1'}
+    setTimeout(()=>{if(ind)ind.style.opacity='0'},2000)
+  },1000)
+}
+
+function showSaved(){
+  const s=document.getElementById('save-status')
+  if(!s)return
+  s.textContent='Saved ✓'
+  s.style.opacity='1'
+  s.style.color='var(--done)'
+  setTimeout(()=>s.style.opacity='0',2000)
+}
+
+function deleteWalk(id){
+  if(!confirm('Delete this walk permanently?'))return
+  walks=walks.filter(w=>w.id!==id)
+  saveWalks()
+  navigate('board')
+}
+
+// ═══════════════════ CALENDAR ═══════════════════
+let calDate=new Date()
+
+function renderCalendar(){
+  document.getElementById('page-title').textContent='Calendar'
+  document.getElementById('page-sub').textContent='Recording & publish schedule'
+  document.getElementById('topbar-actions').innerHTML=''
+
+  const year=calDate.getFullYear()
+  const month=calDate.getMonth()
+  const monthName=calDate.toLocaleDateString('en-US',{month:'long',year:'numeric'})
+
+  // Build day grid
+  const firstDay=new Date(year,month,1)
+  const lastDay=new Date(year,month+1,0)
+  // Start from Monday
+  let startDow=firstDay.getDay()-1
+  if(startDow<0)startDow=6
+  const gridStart=new Date(firstDay)
+  gridStart.setDate(gridStart.getDate()-startDow)
+
+  const events=[]
+  for(const w of walks){
+    if(w.recordingDate)events.push({walk:w,type:'recording',date:new Date(w.recordingDate)})
+    if(w.publishDate)events.push({walk:w,type:'publish',date:new Date(w.publishDate)})
+  }
+
+  const today=new Date()
+
+  let daysHtml=''
+  const cur=new Date(gridStart)
+  for(let i=0;i<42;i++){
+    const isInMonth=cur.getMonth()===month
+    const isToday=cur.toDateString()===today.toDateString()
+    const dateStr=cur.toISOString().split('T')[0]
+    const dayEvs=events.filter(ev=>ev.date.toISOString().split('T')[0]===dateStr)
+    let cls='cal-day'
+    if(!isInMonth)cls+=' other-month'
+    else cls+=' in-month'
+    if(isToday)cls+=' today'
+    let evsHtml=dayEvs.map(ev=>`<div class="cal-event ${ev.type==='recording'?'cal-ev-rec':'cal-ev-pub'}" onclick="navigate('walk','${ev.walk.id}')" title="${ev.walk.title} — ${ev.type}">${ev.walk.title}</div>`).join('')
+    daysHtml+=`<div class="${cls}"><div class="cal-day-num">${cur.getDate()}</div>${evsHtml}</div>`
+    cur.setDate(cur.getDate()+1)
+  }
+
+  document.getElementById('content').innerHTML=`
+  <div class="cal-hdr">
+    <div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:400">${monthName}</div>
+    </div>
+    <div class="cal-nav">
+      <button class="cal-nav-btn" onclick="shiftMonth(-1)">‹</button>
+      <button class="cal-today-btn" onclick="calDate=new Date();renderCalendar()">Today</button>
+      <button class="cal-nav-btn" onclick="shiftMonth(1)">›</button>
+    </div>
+  </div>
+  <div class="cal-grid">
+    <div class="cal-weekdays">
+      ${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d=>`<div class="cal-wd">${d}</div>`).join('')}
+    </div>
+    <div class="cal-days">${daysHtml}</div>
+  </div>
+  <div class="cal-legend">
+    <div class="cal-leg-item"><div class="cal-leg-dot" style="background:rgba(196,98,45,.3)"></div>Recording</div>
+    <div class="cal-leg-item"><div class="cal-leg-dot" style="background:var(--done-light)"></div>Publish</div>
+  </div>`
+}
+
+function shiftMonth(d){
+  calDate=new Date(calDate.getFullYear(),calDate.getMonth()+d,1)
+  renderCalendar()
+}
+
+// ═══════════════════ NEW WALK ═══════════════════
+function openNewWalk(){
+  document.getElementById('nw-title').value=''
+  document.getElementById('nw-district').value=''
+  document.getElementById('nw-protagonist').value=''
+  openModal('new-walk-modal')
+  setTimeout(()=>document.getElementById('nw-title').focus(),50)
+}
+
+function createWalk(){
+  const title=document.getElementById('nw-title').value.trim()
+  if(!title)return
+  const walk={
+    id:'w'+Date.now(),
+    title,
+    city:'Paris',
+    district:document.getElementById('nw-district').value.trim(),
+    protagonist:document.getElementById('nw-protagonist').value.trim(),
+    status:'idea',
+    recordingDate:null,publishDate:null,cost:null,duration:null,notes:'',
+    script:{}
+  }
+  walks.unshift(walk)
+  saveWalks()
+  closeModal('new-walk-modal')
+  currentPhase='arrival'
+  navigate('walk',walk.id)
+}
+
+// ═══════════════════ UTILS ═══════════════════
+function openModal(id){document.getElementById(id).classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+function e(str){return(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function countWords(txt){return txt?txt.trim().split(/\s+/).filter(Boolean).length:0}
+
+// Enter key in new walk title
+document.getElementById('nw-title').addEventListener('keydown',function(e){
+  if(e.key==='Enter'){e.preventDefault();createWalk()}
+})
+
+// ═══════════════════ INIT ═══════════════════
+render()
+</script>
+</body>
+</html>
